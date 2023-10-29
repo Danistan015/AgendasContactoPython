@@ -4,7 +4,7 @@ from tkinter import ttk
 class Vista(Frame):
     
     def __init__(self, master, menu):
-        super().__init__(master, width=890, height=360)
+        super().__init__(master, width=590, height=360)
         self.master = master
         self.menu = menu
         self.center(self.menu)  
@@ -60,32 +60,32 @@ class Vista(Frame):
         lbl1 = Label(frame2, text="Nombre: ")
         lbl1.place(x=4, y=10)
         self.txtNombre = Entry(frame2)
-        self.txtNombre.place(x=4, y=40, width=150, height=20)
+        self.txtNombre.place(x=4, y=40, width=140, height=20)
 
         lbl2 = Label(frame2, text=" Apellido: ")
         lbl2.place(x=4, y=70)
         self.txtApellido = Entry(frame2)
-        self.txtApellido.place(x=4, y=100, width=150, height=20)
+        self.txtApellido.place(x=4, y=100, width=140, height=20)
 
         lbl3 = Label(frame2, text="Telefono: ")
         lbl3.place(x=4, y=130)
         self.txtTelefono = Entry(frame2)
-        self.txtTelefono.place(x=4, y=160, width=150, height=20)
+        self.txtTelefono.place(x=4, y=160, width=140, height=20)
 
         lbl4 = Label(frame2, text=" Correo: ")
         lbl4.place(x=4, y=190)
         self.txtCorreo = Entry(frame2)
-        self.txtCorreo.place(x=4, y=220, width=150, height=20)
+        self.txtCorreo.place(x=4, y=220, width=140, height=20)
 
         lbl5 = Label(frame2, text=" Direccion: ")
         lbl5.place(x=4, y=250)
         self.txtDireccion = Entry(frame2)
-        self.txtDireccion.place(x=4, y=280, width=150, height=20)
+        self.txtDireccion.place(x=4, y=280, width=140, height=20)
 
         
 
         self.grid = ttk.Treeview(self, columns=("col1","col2","col3","col4","col5"))
-        self.grid.place(x=247,y=0,width=620, height=459)
+        self.grid.place(x=247,y=0,width=650, height=459)
         self.grid.column("#0",width=50)
         self.grid.column("col1",width=60, anchor=CENTER)
         self.grid.column("col2",width=90, anchor=CENTER)
