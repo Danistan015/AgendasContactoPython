@@ -5,8 +5,8 @@ def main():
     root = Tk()
     root.wm_title("Menu")
     app = menu(root)
-    center(root)  
-    root.mainloop()
+    center(root)   
+    root.mainloop() 
 
 def center(win):
 

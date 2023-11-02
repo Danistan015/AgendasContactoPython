@@ -1,18 +1,23 @@
 from tkinter import *
 from tkinter import ttk
+from Contacto import *
+from tkinter import messagebox
 
 class Vista(Frame):
     
-    def __init__(self, master, menu):
-        super().__init__(master, width=590, height=360)
-        self.master = master
+    contacto= Contacto()
+    
+    def __init__(self, master, menu): 
+        super().__init__(master,width=590,height=360) 
+        self.master = master 
         self.menu = menu
-        self.center(self.menu)  
-        self.pack(fill=BOTH, expand=True)
-        self.create_widgets()
+        self.center(self.menu) 
+        self.pack(fill=BOTH, expand=True) 
+        self.create_widgets() 
+        self.llenaDatos() 
+        self. id=-1 
         
     def center(self, win):
-     
         win.update_idletasks()
         width = win.winfo_width()
         height = win.winfo_height()
@@ -20,37 +25,121 @@ class Vista(Frame):
         y = (win.winfo_screenheight() // 2) - (height // 2)
         win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
-    def fCancelar(self):
+    def fVolver(self):
         self.master.withdraw()  
         self.ventana_anterior.deiconify()
         
+    
+    def fBuscar(self):
+        nombre = self.txtNombre.get()
+        telefono = self.txtTelefono.get()
+        apellido = self.txtApellido.get()
 
-    def fNuevo(self):
-        pass
+        if nombre == '' and telefono == '' and apellido == '':
+            messagebox.showwarning("Buscar", 'Debes ingresar al menos un valor.')
+        else:
+            resultado = self.contacto.buscar_contacto(nombre,apellido,telefono)
+            if resultado:
+                self.limpiaGrid()
+                self.grid.insert("", END, text=resultado[0], values=(resultado[1], resultado[2], resultado[3], resultado[4], resultado[5]))
+            else:
+                messagebox.showinfo("Buscar", "No se encontraron contactos")
+            
 
-    def fGuardar(self):
-        pass
 
-    def fModificar(self):
-        pass
-
-    def fEliminar(self):
-        pass
-
+    def llenaDatos(self):
+        datos = self.contacto.consulta_contacto()       
+        for row in datos:            
+            self.grid.insert("",END,text=row[0], values=(row[1],row[2], row[3],row[4],row[5]))
+        if len(self.grid.get_children()) > 0:
+            self.grid.selection_set( self.grid.get_children()[0] )
+            
+            
+            
         
+    def limpiarCajas(self):
+        self.txtNombre.delete(0,END)
+        self.txtApellido.delete(0,END)
+        self.txtTelefono.delete(0,END)
+        self.txtCorreo.delete(0,END)
+        self.txtDireccion.delete(0,END)
+        
+    def limpiaGrid(self):
+        for item in self.grid.get_children():
+            self.grid.delete(item)
+                
 
+            
+    
+    def fGuardar(self): 
+        if self.id == -1:       
+            self.contacto.guardar_contacto(self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())            
+            messagebox.showinfo("Guardar", 'Elemento insertado correctamente.')
+        else:
+            self.contacto.modificar_contacto(self.id, self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())
+            messagebox.showinfo("Modificar", 'Elemento modificado correctamente.')
+        self.id = -1
+        self.limpiaGrid()
+        self.llenaDatos() 
+        self.limpiarCajas() 
+    
+
+
+
+    def fCargarDatos(self):        
+        selected = self.grid.focus()                               
+        clave = self.grid.item(selected, 'text')        
+        if clave == '':
+            messagebox.showwarning("Modificar", 'Debes seleccionar un elemento.')            
+        else:            
+            self.id = clave                         
+            valores = self.grid.item(selected, 'values')
+            self.limpiarCajas()            
+            self.txtNombre.insert(0, valores[0])
+            self.txtApellido.insert(0, valores[1])
+            self.txtTelefono.insert(0, valores[2])
+            self.txtCorreo.insert(0, valores[3])
+            self.txtDireccion.insert(0, valores[4])
+            self.txtNombre.focus() 
+
+
+                                            
+    def fEliminar(self):
+        selected = self.grid.focus()                               
+        clave = self.grid.item(selected,'text')        
+        if clave == '':
+            messagebox.showwarning("Eliminar", 'Debes seleccionar un elemento.')            
+        else:                           
+            valores = self.grid.item(selected,'values')
+            data = str(clave) + ", " + valores[0] + ", " + valores[1]
+            r = messagebox.askquestion("Eliminar", "Deseas eliminar el registro seleccionado?\n" + data)            
+            if r == messagebox.YES:
+                n = self.contacto.eliminar_contacto(clave)
+                if n == 1:
+                    messagebox.showinfo("Eliminar", 'Elemento eliminado correctamente.')
+                    self.limpiaGrid()
+                    self.llenaDatos()
+                else:
+                    messagebox.showwarning("Eliminar", 'No fue posible eliminar el elemento.')
+                            
+   
+    
+ 
     def create_widgets(self):
         frame1 = Frame(self, bg="#9370DB")
-        frame1.place(x=0,y=0,width=110, height=559)
-        self.btnGuardar=Button(frame1,text="Guardar", command=self.fNuevo, bg="magenta", fg="white")
+        frame1.place(x=0,y=0,width=150, height=559)
+        self.btnGuardar=Button(frame1,text="Guardar", command=self.fGuardar, bg="magenta", fg="white")
         self.btnGuardar.place(x=6,y=50,width=80, height=30 )
-        self.btnModificar=Button(frame1,text="Modificar", command=self.fModificar, bg="magenta", fg="white")
-        self.btnModificar.place(x=6,y=90,width=80, height=30)
+        self.btnCargarDatos=Button(frame1,text="Cargar Datos", command=self.fCargarDatos, bg="magenta", fg="white")
+        self.btnCargarDatos.place(x=6,y=90,width=80, height=30)
         self.btnEliminar=Button(frame1,text="Eliminar", command=self.fEliminar, bg="magenta", fg="white")
         self.btnEliminar.place(x=6,y=130,width=80, height=30)
-        self.btnBuscar=Button(frame1,text="Buscar", command=self.fGuardar, bg="magenta", fg="white")
+        self.btnBuscar=Button(frame1,text="Buscar", command=self.fBuscar, bg="magenta", fg="white")
         self.btnBuscar.place(x=6,y=170,width=80, height=30)
-        self.btnVolver=Button(frame1,text="Volver", command=self.fCancelar, bg="red", fg="white")
+        
+    
+    
+        self.btnVolver=Button(frame1,text="Volver", command=self.fVolver, bg="red", fg="white")
         self.btnVolver.place(x=6,y=300,width=80, height=30)
         
 

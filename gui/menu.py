@@ -16,6 +16,7 @@ class menu(Frame):
         self.menu.title("Contactos") 
         self.center(self.menu)  
         self.app = Vista(self.menu, self.master)  
+        
     def center(self, win):
      
         win.update_idletasks()
