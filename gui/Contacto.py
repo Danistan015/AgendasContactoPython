@@ -66,12 +66,25 @@ class Contacto:
     def buscar_contacto(self, nombre, apellido, telefono):
         cur = self.cnn.cursor()
 
-        sql = "SELECT * FROM contacto WHERE nombre LIKE '%{}%' OR apellido LIKE '%{}%' OR telefono LIKE '%{}%'".format(nombre, apellido, telefono)
-        cur.execute(sql)
-        datos = cur.fetchall() 
-        cur.close()
+        sql = "SELECT * FROM contacto WHERE "
+        conditions = []
+        if nombre:
+            conditions.append("nombre LIKE '%{}%'".format(nombre))
+        if apellido:
+            conditions.append("apellido LIKE '%{}%'".format(apellido))
+        if telefono:
+            conditions.append("telefono LIKE '%{}%'".format(telefono))
 
-        return datos
+        if conditions:
+            sql += " OR ".join(conditions)
+
+            cur.execute(sql)
+            datos = cur.fetchall()
+            cur.close()
+
+            return datos
+        else:
+            return None
 
 
     def guardar_contacto(self, nombre, apellido, telefono, correo, direccion):

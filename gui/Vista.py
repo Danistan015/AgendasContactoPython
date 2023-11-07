@@ -2,6 +2,14 @@ from tkinter import *
 from tkinter import ttk
 from Contacto import *
 from tkinter import messagebox
+import mysql.connector
+from mysql.connector import errorcode
+
+def validate_name_input(new_value):
+    return all(c.isalpha() or c.isspace() for c in new_value)
+
+def validate_phone_input(new_value):
+    return all(c.isdigit() for c in new_value)
 
 class Vista(Frame):
     
@@ -73,20 +81,24 @@ class Vista(Frame):
             self.grid.delete(item)
                 
 
-            
-    
     def fGuardar(self): 
-        if self.id == -1:       
-            self.contacto.guardar_contacto(self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())            
-            messagebox.showinfo("Guardar", 'Elemento insertado correctamente.')
-        else:
-            self.contacto.modificar_contacto(self.id, self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())
-            messagebox.showinfo("Modificar", 'Elemento modificado correctamente.')
-        self.id = -1
-        self.limpiaGrid()
-        self.llenaDatos() 
-        self.limpiarCajas() 
-    
+        try:
+            if self.id == -1:       
+                self.contacto.guardar_contacto(self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())            
+                messagebox.showinfo("Guardar", 'Elemento insertado correctamente.')
+            else:
+                self.contacto.modificar_contacto(self.id, self.txtNombre.get(), self.txtApellido.get(), self.txtTelefono.get(), self.txtCorreo.get(), self.txtDireccion.get())
+                messagebox.showinfo("Modificar", 'Elemento modificado correctamente.')
+            self.id = -1
+            self.limpiaGrid()
+            self.llenaDatos() 
+            self.limpiarCajas() 
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_DUP_ENTRY:
+                messagebox.showerror("Error", "El número de teléfono ya existe en la base de datos. Por favor, utilice un número de teléfono diferente.")
+            else:
+                messagebox.showerror("Error", "Se produjo un error en la base de datos: {}".format(err))
+
 
 
 
@@ -129,6 +141,10 @@ class Vista(Frame):
     def fCargarTabla(self):
         self.limpiaGrid()  
         self.llenaDatos()
+    def fLimpiar(self):
+        self.limpiarCajas()  
+        self.txtNombre.focus() 
+        
 
     def create_widgets(self):
         frame1 = Frame(self, bg="#9370DB")
@@ -143,6 +159,8 @@ class Vista(Frame):
         self.btnBuscar.place(x=6,y=170,width=80, height=30)
         self.btnCargarTabla=Button(frame1,text="Cargar Tabla", command=self.fCargarTabla, bg="magenta", fg="white")
         self.btnCargarTabla.place(x=6,y=210,width=80, height=30)
+        self.btnLimpiar=Button(frame1,text="Limpiar texto", command=self.fLimpiar, bg="magenta", fg="white")
+        self.btnLimpiar.place(x=6,y=250,width=80, height=30)
         
     
     
@@ -155,19 +173,22 @@ class Vista(Frame):
 
         lbl1 = Label(frame2, text="Nombre: ")
         lbl1.place(x=4, y=10)
-        self.txtNombre = Entry(frame2)
+        self.txtNombre = Entry(frame2, validate="key")
+        self.txtNombre['validatecommand'] = (self.txtNombre.register(validate_name_input), '%P')
         self.txtNombre.place(x=4, y=40, width=140, height=20)
 
         lbl2 = Label(frame2, text=" Apellido: ")
         lbl2.place(x=4, y=70)
-        self.txtApellido = Entry(frame2)
+        self.txtApellido = Entry(frame2, validate="key")
+        self.txtApellido['validatecommand'] = (self.txtApellido.register(validate_name_input), '%P')
         self.txtApellido.place(x=4, y=100, width=140, height=20)
 
         lbl3 = Label(frame2, text="Telefono: ")
         lbl3.place(x=4, y=130)
-        self.txtTelefono = Entry(frame2)
+        self.txtTelefono = Entry(frame2, validate="key")
+        self.txtTelefono['validatecommand'] = (self.txtTelefono.register(validate_phone_input), '%P')
         self.txtTelefono.place(x=4, y=160, width=140, height=20)
-
+        
         lbl4 = Label(frame2, text=" Correo: ")
         lbl4.place(x=4, y=190)
         self.txtCorreo = Entry(frame2)
