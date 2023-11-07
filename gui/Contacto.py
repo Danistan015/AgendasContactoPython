@@ -65,11 +65,14 @@ class Contacto:
     
     def buscar_contacto(self, nombre, apellido, telefono):
         cur = self.cnn.cursor()
-        sql = "SELECT * FROM contacto WHERE nombre = '{}' OR apellido = '{}' OR telefono = '{}'".format(nombre, apellido, telefono)
+
+        sql = "SELECT * FROM contacto WHERE nombre LIKE '%{}%' OR apellido LIKE '%{}%' OR telefono LIKE '%{}%'".format(nombre, apellido, telefono)
         cur.execute(sql)
-        datos = cur.fetchone()
-        cur.close()    
+        datos = cur.fetchall() 
+        cur.close()
+
         return datos
+
 
     def guardar_contacto(self, nombre, apellido, telefono, correo, direccion):
         cur = self.cnn.cursor()
@@ -99,6 +102,7 @@ class Contacto:
         self.cnn.commit()    
         cur.close()
         return n  
+
 
     def __init__(self):
         self.cnn = mysql.connector.connect(host="localhost", user="root", 

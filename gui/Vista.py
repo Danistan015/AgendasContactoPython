@@ -38,12 +38,16 @@ class Vista(Frame):
         if nombre == '' and telefono == '' and apellido == '':
             messagebox.showwarning("Buscar", 'Debes ingresar al menos un valor.')
         else:
-            resultado = self.contacto.buscar_contacto(nombre,apellido,telefono)
+            # Llama a la función buscar_contacto con los valores ingresados
+            resultado = self.contacto.buscar_contacto(nombre, apellido, telefono)
+
             if resultado:
                 self.limpiaGrid()
-                self.grid.insert("", END, text=resultado[0], values=(resultado[1], resultado[2], resultado[3], resultado[4], resultado[5]))
+                for row in resultado:
+                    self.grid.insert("", END, text=row[0], values=(row[1], row[2], row[3], row[4], row[5]))
             else:
                 messagebox.showinfo("Buscar", "No se encontraron contactos")
+
             
 
 
@@ -121,10 +125,11 @@ class Vista(Frame):
                     self.llenaDatos()
                 else:
                     messagebox.showwarning("Eliminar", 'No fue posible eliminar el elemento.')
-                            
-   
-    
- 
+
+    def fCargarTabla(self):
+        self.limpiaGrid()  
+        self.llenaDatos()
+
     def create_widgets(self):
         frame1 = Frame(self, bg="#9370DB")
         frame1.place(x=0,y=0,width=150, height=559)
@@ -136,6 +141,8 @@ class Vista(Frame):
         self.btnEliminar.place(x=6,y=130,width=80, height=30)
         self.btnBuscar=Button(frame1,text="Buscar", command=self.fBuscar, bg="magenta", fg="white")
         self.btnBuscar.place(x=6,y=170,width=80, height=30)
+        self.btnCargarTabla=Button(frame1,text="Cargar Tabla", command=self.fCargarTabla, bg="magenta", fg="white")
+        self.btnCargarTabla.place(x=6,y=210,width=80, height=30)
         
     
     
